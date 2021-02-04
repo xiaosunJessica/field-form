@@ -238,7 +238,7 @@ export type InternalFormInstance = Omit<FormInstance, 'validateFields'> & {
    * Form component should register some content into store.
    * We pass the `HOOK_MARK` as key to avoid user call the function.
    */
-  getInternalHooks: (secret: string) => InternalHooks | null;
+  getInternalHooks: (secret?: string) => Partial<InternalHooks> | null;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

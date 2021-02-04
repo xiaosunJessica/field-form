@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-03 11:31:23
- * @LastEditTime: 2021-02-04 10:47:13
+ * @LastEditTime: 2021-02-04 13:15:41
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /field-form/src/useForm.ts
@@ -20,13 +20,17 @@ import type {
 
 import {
   getNamePath,
-  getValue
+  getValue,
+  setValues
 } from './utils/valueUtil'
 
 export class FormStore {
   
   // store用来存储表单数据，它的格式是：{"username": "sun"}
   private store: Store = {}
+
+  // 定义初始化变量
+  private initialValues = {};
 
   // 用来存储每个field的实例数据，因此在store中可以通过fieldEntities来访问每个表单项
   private fieldEntities: FieldEntity[] = [];
@@ -81,6 +85,22 @@ export class FormStore {
     console.log(this.getFieldsValue())
   }
 
+  // 初始化变量
+  setInitialValues = (initialValues: any, init: boolean) => {
+    this.initialValues = initialValues;
+    if (init) {
+      this.store = setValues({}, initialValues, this.store)
+    }
+  }
+
+  // 供内部使用的相关方法集合
+  getInternalHooks = () => {
+    console.log(this.setInitialValues, 'this.setInitialValuesthis.setInitialValues')
+    return {
+      setInitialValues: this.setInitialValues
+    }
+  }
+
   // 提供formStore实例方法
   public getForm = (): Partial<InternalFormInstance> => ({
     getFieldValue: this.getFieldValue,
@@ -88,8 +108,12 @@ export class FormStore {
     setFieldsValue: this.setFieldsValue,
     submit: this.submit,
     registerField: this.registerField,
+    getInternalHooks: this.getInternalHooks
   })
+
 }
+
+
 
 // 创建单例formStore
 export default function useForm<Values = any>(form?: FormInstance<Values>): [FormInstance<Values>|any] {
