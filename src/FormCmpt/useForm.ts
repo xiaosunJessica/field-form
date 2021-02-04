@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-03 11:31:23
- * @LastEditTime: 2021-02-04 13:15:41
+ * @LastEditTime: 2021-02-04 13:29:01
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /field-form/src/useForm.ts
@@ -32,6 +32,9 @@ export class FormStore {
   // 定义初始化变量
   private initialValues = {};
 
+  // 存放回调函数
+  private callbacks = {} as any;
+
   // 用来存储每个field的实例数据，因此在store中可以通过fieldEntities来访问每个表单项
   private fieldEntities: FieldEntity[] = [];
 
@@ -49,14 +52,17 @@ export class FormStore {
   // 设置字段的值
   private setFieldsValue = (newStore: Store) => {
     // 更新store的值
-    this.store = {
-      ...this.store,
-      ...newStore,
+    const preStore = this.store;
+    if (newStore) {
+      this.store = setValues(this.store, newStore)
     }
-
-    this.notifyObservers(this.store)
+    this.notifyObservers(preStore)
   }
 
+  // 之前写一个registerField是用来设置Field实例的存储，再添加一个获取方法
+  getFieldEntities = () => {
+    return this.fieldEntities;
+  }
 
   // 表单注册到fieldEntities
   private registerField = (entity: FieldEntity) => {
@@ -69,20 +75,17 @@ export class FormStore {
   }
 
   // 监听改变
-  private notifyObservers = (store: Store) => {
-    this.fieldEntities.forEach((entity: any) => {
-      const { name } = entity.props;
-      Object.keys(store).forEach(key => {
-        if (key === name) {
-          entity.onStoreChange();
-        }
-      })
+  private notifyObservers = (prevStore: Store) => {
+    this.getFieldEntities().forEach((entity: any) => {
+      const { onStoreChange } = entity;
+      onStoreChange(prevStore, this.getFieldsValue());
     })
   }
 
   // 提交数据，获取store
   private submit = () => {
-    console.log(this.getFieldsValue())
+    const { onFinish } = this.callbacks;
+    onFinish(this.getFieldsValue())
   }
 
   // 初始化变量
@@ -93,11 +96,16 @@ export class FormStore {
     }
   }
 
+  // 提交回调
+  setCallbacks = (cbs: any) => {
+    this.callbacks = cbs;
+  }
+
   // 供内部使用的相关方法集合
   getInternalHooks = () => {
-    console.log(this.setInitialValues, 'this.setInitialValuesthis.setInitialValues')
     return {
-      setInitialValues: this.setInitialValues
+      setInitialValues: this.setInitialValues,
+      setCallbacks: this.setCallbacks,
     }
   }
 

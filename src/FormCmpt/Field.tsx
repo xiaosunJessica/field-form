@@ -1,7 +1,7 @@
 /*
 * @Author: your name
 * @Date: 2021-02-03 12:59:40
- * @LastEditTime: 2021-02-04 11:46:04
+ * @LastEditTime: 2021-02-04 13:24:59
  * @LastEditors: Please set LastEditors
 * @Description: In User Settings Edit
 * @FilePath: /field-form/src/Field.ts
@@ -98,8 +98,15 @@ export default class Field extends React.Component<FieldProps, FieldState> {
     }
   }
 
-  public onStoreChange = () => {
-    this.forceUpdate()
+  public onStoreChange = (prevStore: any, curStore: any) => {
+    const { shouldUpdate } = this.props as any;
+    if (typeof shouldUpdate === 'function') {
+      if (shouldUpdate(prevStore, curStore)) {
+        this.forceUpdate()
+      }
+    } else {
+      this.forceUpdate()
+    }
   }
 
   // Field中传进来的子元素变为受控组件，也就是主动添加value和onChange方法

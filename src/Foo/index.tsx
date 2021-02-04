@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-03 11:21:48
- * @LastEditTime: 2021-02-04 13:16:04
+ * @LastEditTime: 2021-02-04 13:21:47
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /field-form/src/Foo/index.tsx
@@ -18,7 +18,11 @@ export default class extends React.Component {
 
   render() {
     return (
-      <Form ref={this.formRef} initialValues={{ username: 'strange', password: 123 }}>
+      <Form ref={this.formRef} 
+        initialValues={{ username: 'strange', password: 123 }}
+        onFinish={(values: any) => {
+          console.log('Submit:', values);
+        }}>
       	<Field name='username'>
         	<Input />
         </Field>
