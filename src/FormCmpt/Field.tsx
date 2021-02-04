@@ -1,14 +1,14 @@
 /*
 * @Author: your name
 * @Date: 2021-02-03 12:59:40
- * @LastEditTime: 2021-02-03 13:28:00
+ * @LastEditTime: 2021-02-04 11:46:04
  * @LastEditors: Please set LastEditors
 * @Description: In User Settings Edit
 * @FilePath: /field-form/src/Field.ts
 */
 
 import * as React from 'react';
-import FieldContext from './fieldContext';
+import FieldContext from './FieldContext';
 import {
   FieldEntity,
   FormInstance,
@@ -78,14 +78,15 @@ export interface FieldState {
   resetCount: number;
 }
 
-export default class Field extends React.Component<InternalFieldProps, FieldState> {
+export default class Field extends React.Component<FieldProps, FieldState> {
   // field组件获取fieldContext
-  public static contextType = FieldContext;
+  static contextType = FieldContext;
 
   private cancelRegisterFunc: any;
 
   // field挂载时，把职级注册到fieldContext中，也就是上面提及的fieldEntities数组中
   componentDidMount() {
+    console.log(this.context, 'this.contextthis.context- componentDidMount -')
     const { registerField } = this.context;
     this.cancelRegisterFunc = registerField(this)
   }

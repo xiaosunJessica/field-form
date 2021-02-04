@@ -1,7 +1,7 @@
 /*
 * @Author: your name
 * @Date: 2021-02-03 12:51:34
- * @LastEditTime: 2021-02-03 12:59:27
+ * @LastEditTime: 2021-02-04 11:47:29
  * @LastEditors: Please set LastEditors
 * @Description: In User Settings Edit
 * @FilePath: /field-form/src/Form.tsx
@@ -28,3 +28,5 @@ ref,) => {
     </form>
   )
 }
+
+export default Form;

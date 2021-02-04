@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-02-03 11:31:23
- * @LastEditTime: 2021-02-03 12:02:47
+ * @LastEditTime: 2021-02-04 10:47:13
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: /field-form/src/useForm.ts
@@ -56,6 +56,7 @@ export class FormStore {
 
   // 表单注册到fieldEntities
   private registerField = (entity: FieldEntity) => {
+    console.log(entity, 'entityentityentity')
     this.fieldEntities.push(entity);
     return () => {
       this.fieldEntities = this.fieldEntities.filter((item) => item!== entity);
