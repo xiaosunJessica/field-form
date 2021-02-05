@@ -1,7 +1,7 @@
 /*
 * @Author: your name
 * @Date: 2021-02-03 12:59:40
- * @LastEditTime: 2021-02-04 13:24:59
+ * @LastEditTime: 2021-02-05 11:27:55
  * @LastEditors: Please set LastEditors
 * @Description: In User Settings Edit
 * @FilePath: /field-form/src/Field.ts
@@ -22,6 +22,7 @@ import {
   StoreValue,
   EventArgs,
 } from './interface';
+import RawAsyncValidator from 'async-validator';
 
 export type ShouldUpdate<Values = any> =
   | boolean
@@ -84,6 +85,10 @@ export default class Field extends React.Component<FieldProps, FieldState> {
 
   private cancelRegisterFunc: any;
 
+  private validatePromise: Promise<string[]> | null = null;
+
+  private errors: string[] = [];
+
   // field挂载时，把职级注册到fieldContext中，也就是上面提及的fieldEntities数组中
   componentDidMount() {
     console.log(this.context, 'this.contextthis.context- componentDidMount -')
@@ -121,6 +126,85 @@ export default class Field extends React.Component<FieldProps, FieldState> {
       }
     }
   }
+
+  // Field组件根据rules校验函数
+  validateRules = () => {
+    const { getFieldValue } = this.context;
+    const { name } = this.props as any;
+    const currentValue = getFieldValue(name);
+
+    // async-validator库的校验结果是Promise
+    const rootPromise = Promise.resolve()
+    .then(() => {
+      // 获取rules规则
+      let filteredRules = this.getRules();
+      // 获取执行校验结果是Promise
+      const promise = this.executeValidate(name, currentValue, filteredRules);
+
+      promise
+      .catch((e: any) => e)
+      .then((errors: string[] = []) => {
+        if (this.validatePromise === rootPromise) {
+          this.validatePromise = null;
+          this.errors = errors;
+          this.forceUpdate();
+        }
+      })
+      return promise;
+    })
+
+    this.validatePromise = rootPromise;
+    return rootPromise;
+  }
+
+  // 获取rules校验结果
+  public getRules = () => {
+    const { rules } = this.props as any;
+    return rules.map((rule: any) => {
+      if (typeof rule === 'function') {
+        return rule(this.context)
+      }
+      return rule
+    })
+  }
+
+  // 执行规则校验
+  executeValidate = (namePath: any, value: any, rules: any) => {
+    let summaryPromise: Promise<string[]>;
+    summaryPromise = new Promise(async (resolve, reject) => {
+      // 多个规则遍历校验，只要其中一条规则校验失败，就不用继续，返回错误
+      for (let i = 0; i < rules.length; i++) {
+        const errors = await this.validateRule(namePath, value, rules[i]);
+        if (errors.length) {
+          reject(errors)
+          return;
+        }
+      }
+      resolve([])
+    })
+    return summaryPromise
+  } 
+
+  // 对单条规则进行校验的方法
+  validateRule = async (name: any, value: any, rule: any) => {
+    const cloneRule = { ...rule };
+
+    const validator = new RawAsyncValidator({
+      [name]: [cloneRule]
+    })
+
+    let result = [];
+    try {
+      await Promise.resolve(validator.validate({[name]: value}))
+    } catch (error) {
+      if (error.errors) {
+        result = error.errors.map((e: any) => e.message)
+      }
+    }
+
+    return result;
+  }
+
   
   render() {
     const {children} = this.props as any;

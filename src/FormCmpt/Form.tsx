@@ -1,7 +1,7 @@
 /*
 * @Author: your name
 * @Date: 2021-02-03 12:51:34
- * @LastEditTime: 2021-02-04 13:21:10
+ * @LastEditTime: 2021-02-05 11:32:59
  * @LastEditors: Please set LastEditors
 * @Description: In User Settings Edit
 * @FilePath: /field-form/src/Form.tsx
@@ -68,7 +68,14 @@ ref,) => {
 
   return (
     <form
-      {...restProps}>
+      {...restProps}
+      onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        formInstance.submit();
+      }}
+      >
       <FieldContext.Provider value={formInstance}>
         {children}
       </FieldContext.Provider>
